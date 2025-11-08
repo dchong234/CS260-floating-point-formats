@@ -1,0 +1,33 @@
+{
+  "seed": 321,
+  "out_csv": "results/sweep.csv",
+  "experiments": [
+    {
+      "algo": "matmul",
+      "sizes": [64, 96, 128],
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "accumulate_in_fp32": [true, false],
+      "kahan": true,
+      "trials": 3
+    },
+    {
+      "algo": "gd_quadratic",
+      "dim": 64,
+      "step_size": 0.008,
+      "max_iters": 500,
+      "tol": 1e-6,
+      "precisions": ["fp64", "tf32", "bf16", "p3109_8"],
+      "trials": 5,
+      "ill_conditioned": true
+    },
+    {
+      "algo": "newton",
+      "function": "x3_minus_2",
+      "initials": [0.25, 1.0, 2.5],
+      "max_iters": 80,
+      "tol": 1e-9,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"]
+    }
+  ]
+}
+

@@ -1,0 +1,32 @@
+{
+  "seed": 123,
+  "out_csv": "results/sanity.csv",
+  "experiments": [
+    {
+      "algo": "matmul",
+      "sizes": [32],
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "accumulate_in_fp32": [true, false],
+      "kahan": false,
+      "trials": 1
+    },
+    {
+      "algo": "gd_quadratic",
+      "dim": 16,
+      "step_size": 0.01,
+      "max_iters": 300,
+      "tol": 1e-6,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "trials": 1
+    },
+    {
+      "algo": "newton",
+      "function": "x3_minus_2",
+      "initials": [0.5, 1.0],
+      "max_iters": 50,
+      "tol": 1e-8,
+      "precisions": ["fp64", "fp32", "bf16", "p3109_8"]
+    }
+  ]
+}
+
