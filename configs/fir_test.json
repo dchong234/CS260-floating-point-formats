@@ -1,0 +1,16 @@
+{
+  "seed": 123,
+  "out_csv": "results/fir_test.csv",
+  "experiments": [
+    {
+      "algo": "fir",
+      "filter_order": 8,
+      "signal_length": 32,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "accumulate_in_fp32": [true, false],
+      "kahan": false,
+      "trials": 1
+    }
+  ]
+}
+

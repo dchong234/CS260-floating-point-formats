@@ -1,0 +1,163 @@
+{
+  "seed": 42,
+  "out_csv": "results/full_sweep.csv",
+  "experiments": [
+    {
+      "algo": "matmul",
+      "sizes": [32, 64, 96, 128, 192, 256],
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "accumulate_in_fp32": [true, false],
+      "kahan": false,
+      "trials": 5
+    },
+    {
+      "algo": "gd_quadratic",
+      "dim": 16,
+      "step_size": 0.01,
+      "max_iters": 300,
+      "tol": 1e-6,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "trials": 10,
+      "ill_conditioned": false
+    },
+    {
+      "algo": "gd_quadratic",
+      "dim": 16,
+      "step_size": 0.005,
+      "max_iters": 800,
+      "tol": 1e-6,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "trials": 10,
+      "ill_conditioned": true
+    },
+    {
+      "algo": "gd_quadratic",
+      "dim": 32,
+      "step_size": 0.01,
+      "max_iters": 400,
+      "tol": 1e-6,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "trials": 10,
+      "ill_conditioned": false
+    },
+    {
+      "algo": "gd_quadratic",
+      "dim": 32,
+      "step_size": 0.005,
+      "max_iters": 1000,
+      "tol": 1e-6,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "trials": 10,
+      "ill_conditioned": true
+    },
+    {
+      "algo": "gd_quadratic",
+      "dim": 64,
+      "step_size": 0.008,
+      "max_iters": 500,
+      "tol": 1e-6,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "trials": 10,
+      "ill_conditioned": false
+    },
+    {
+      "algo": "gd_quadratic",
+      "dim": 64,
+      "step_size": 0.004,
+      "max_iters": 1200,
+      "tol": 1e-6,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "trials": 10,
+      "ill_conditioned": true
+    },
+    {
+      "algo": "newton",
+      "function": "x3_minus_2",
+      "initials": [0.25, 0.5, 1.0, 1.5, 2.0],
+      "max_iters": 50,
+      "tol": 1e-8,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"]
+    },
+    {
+      "algo": "fir",
+      "filter_order": 8,
+      "signal_length": 256,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "kahan": false,
+      "trials": 3
+    },
+    {
+      "algo": "fir",
+      "filter_order": 8,
+      "signal_length": 512,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "kahan": false,
+      "trials": 3
+    },
+    {
+      "algo": "fir",
+      "filter_order": 8,
+      "signal_length": 1024,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "kahan": false,
+      "trials": 3
+    },
+    {
+      "algo": "fir",
+      "filter_order": 16,
+      "signal_length": 256,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "kahan": false,
+      "trials": 3
+    },
+    {
+      "algo": "fir",
+      "filter_order": 16,
+      "signal_length": 512,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "kahan": false,
+      "trials": 3
+    },
+    {
+      "algo": "fir",
+      "filter_order": 16,
+      "signal_length": 1024,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "kahan": false,
+      "trials": 3
+    },
+    {
+      "algo": "fir",
+      "filter_order": 32,
+      "signal_length": 512,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "kahan": false,
+      "trials": 3
+    },
+    {
+      "algo": "fir",
+      "filter_order": 32,
+      "signal_length": 1024,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "kahan": false,
+      "trials": 3
+    },
+    {
+      "algo": "fir",
+      "filter_order": 64,
+      "signal_length": 512,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "kahan": false,
+      "trials": 3
+    },
+    {
+      "algo": "fir",
+      "filter_order": 64,
+      "signal_length": 1024,
+      "precisions": ["fp64", "fp32", "tf32", "bf16", "p3109_8"],
+      "kahan": false,
+      "trials": 3
+    }
+  ]
+}
+

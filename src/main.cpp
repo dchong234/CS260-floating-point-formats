@@ -1,3 +1,4 @@
+#include <cmath>
 #include <filesystem>
 #include <iostream>
 #include <optional>
@@ -10,6 +11,7 @@
 #include "algorithms/matmul.hpp"
 #include "algorithms/gradient_descent.hpp"
 #include "algorithms/newton.hpp"
+#include "algorithms/fir.hpp"
 #include "formats/precision.hpp"
 
 using fpstudy::core::CsvWriter;
@@ -446,6 +448,103 @@ int main(int argc, char** argv) {
                                      truth_vec, std::vector<fmt::P3109Number>{result.root},
                                      result.iterations, result.converged, elapsed);
                             break;
+                        }
+                    }
+                }
+            }
+        } else if (algo == "fir") {
+            std::size_t filter_order = static_cast<std::size_t>(require_field(exp, "filter_order").as_number());
+            std::size_t signal_length = static_cast<std::size_t>(require_field(exp, "signal_length").as_number());
+            auto precisions = parse_precisions(require_field(exp, "precisions"));
+            std::size_t trials = exp.contains("trials") ? static_cast<std::size_t>(require_field(exp, "trials").as_number()) : std::size_t(1);
+            auto accumulate_flags = exp.contains("accumulate_in_fp32")
+                ? parse_bool_list(&require_field(exp, "accumulate_in_fp32"))
+                : std::vector<bool>{false};
+            bool use_kahan = exp.contains("kahan") && require_field(exp, "kahan").as_bool();
+
+            for (std::size_t trial = 0; trial < trials; ++trial) {
+                uint32_t trial_seed = base_seed + static_cast<uint32_t>(filter_order * 701 + signal_length * 503 + trial * 41);
+                fpstudy::core::Random rng(trial_seed);
+                
+                // Generate random filter coefficients and normalize to sum to 1
+                auto h = core::random_vector(filter_order, rng, 1.0);
+                double h_sum = 0.0;
+                for (double coeff : h) {
+                    h_sum += coeff;
+                }
+                if (std::abs(h_sum) > 1e-12) {
+                    for (double& coeff : h) {
+                        coeff /= h_sum;
+                    }
+                }
+                
+                // Generate random input signal
+                auto x = core::random_vector(signal_length, rng, 1.0);
+                
+                // Compute truth using FP64
+                auto truth = alg::fir_filter<double>(h, x, {use_kahan, false});
+
+                for (bool accumulate : accumulate_flags) {
+                    for (auto precision : precisions) {
+                        alg::FIROptions opts{use_kahan, accumulate};
+                        std::string size_str = std::to_string(filter_order) + "x" + std::to_string(signal_length);
+                        json::Object params;
+                        params.emplace("filter_order", json::Value(static_cast<double>(filter_order)));
+                        params.emplace("signal_length", json::Value(static_cast<double>(signal_length)));
+                        params.emplace("trial", json::Value(static_cast<double>(trial)));
+                        params.emplace("accumulate_in_fp32", json::Value(accumulate));
+                        params.emplace("kahan", json::Value(use_kahan));
+
+                        switch (precision) {
+                            case fmt::Precision::FP64: {
+                                core::ScopedTimer timer;
+                                auto result = alg::fir_filter<double>(h, x, {use_kahan, false});
+                                auto elapsed = timer.elapsed_ms();
+                                emit_run(params, algo, size_str, precision, trial_seed, writer,
+                                         truth, result, 0, true, elapsed);
+                                break;
+                            }
+                            case fmt::Precision::FP32: {
+                                auto h32 = fmt::cast_vector<float>(h);
+                                auto x32 = fmt::cast_vector<float>(x);
+                                core::ScopedTimer timer;
+                                auto result = alg::fir_filter<float>(h32, x32, opts);
+                                auto elapsed = timer.elapsed_ms();
+                                emit_run(params, algo, size_str, precision, trial_seed, writer,
+                                         truth, result, 0, true, elapsed);
+                                break;
+                            }
+                            case fmt::Precision::TF32: {
+                                auto h19 = fmt::cast_vector<fmt::TF32>(h);
+                                auto x19 = fmt::cast_vector<fmt::TF32>(x);
+                                core::ScopedTimer timer;
+                                auto result = alg::fir_filter<fmt::TF32>(h19, x19, opts);
+                                auto elapsed = timer.elapsed_ms();
+                                emit_run(params, algo, size_str, precision, trial_seed, writer,
+                                         truth, result, 0, true, elapsed);
+                                break;
+                            }
+                            case fmt::Precision::BF16: {
+                                auto h16 = fmt::cast_vector<fmt::BF16>(h);
+                                auto x16 = fmt::cast_vector<fmt::BF16>(x);
+                                core::ScopedTimer timer;
+                                auto result = alg::fir_filter<fmt::BF16>(h16, x16, opts);
+                                auto elapsed = timer.elapsed_ms();
+                                emit_run(params, algo, size_str, precision, trial_seed, writer,
+                                         truth, result, 0, true, elapsed);
+                                break;
+                            }
+                            case fmt::Precision::P3109_8: {
+                                fmt::P3109Number::set_accumulate_fp32(accumulate);
+                                auto h8 = fmt::cast_vector<fmt::P3109Number>(h);
+                                auto x8 = fmt::cast_vector<fmt::P3109Number>(x);
+                                core::ScopedTimer timer;
+                                auto result = alg::fir_filter<fmt::P3109Number>(h8, x8, opts);
+                                auto elapsed = timer.elapsed_ms();
+                                emit_run(params, algo, size_str, precision, trial_seed, writer,
+                                         truth, result, 0, true, elapsed);
+                                break;
+                            }
                         }
                     }
                 }
