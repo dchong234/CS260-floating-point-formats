@@ -23,6 +23,7 @@ bool run_matmul_tests() {
 
 bool run_iterative_tests();
 bool run_io_tests();
+bool run_fir_tests();
 
 int main(int argc, char** argv) {
     if (argc < 2) {
@@ -37,6 +38,8 @@ int main(int argc, char** argv) {
         ok = run_iterative_tests();
     } else if (suite == "IO") {
         ok = run_io_tests();
+    } else if (suite == "FIR") {
+        ok = run_fir_tests();
     } else {
         std::cerr << "Unknown test suite: " << suite << "\n";
         return 1;

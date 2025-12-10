@@ -66,10 +66,12 @@ if(FPSTUDY_BUILD_TESTS)
         tests/matmul_tests.cpp
         tests/iterative_tests.cpp
         tests/io_tests.cpp
+        tests/fir_tests.cpp
     )
     target_link_libraries(fpstudy_tests PRIVATE fpstudy_formats fpstudy_algorithms ${UNIVERSAL_TARGET})
     add_test(NAME MatMulTests COMMAND fpstudy_tests MatMul)
     add_test(NAME IterativeTests COMMAND fpstudy_tests Iterative)
     add_test(NAME IOTests COMMAND fpstudy_tests IO)
+    add_test(NAME FIRTests COMMAND fpstudy_tests FIR)
 endif()
 
